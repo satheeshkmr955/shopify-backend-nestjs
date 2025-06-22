@@ -1,0 +1,40 @@
+services:
+  yugabyte:
+    image: yugabytedb/yugabyte:2.25.2.0-b359
+    container_name: yugabyte
+    ports:
+      - '7000:7000' # YB-Master UI and RPC
+      - '9001:9000' # YB-TServer UI and RPC
+      - '15433:15433' # YSQL API (PostgreSQL-compatible)
+      - '5433:5433' # YSQL API (PostgreSQL-compatible, common default)
+      - '9042:9042' # YCQL API (Cassandra-compatible)
+    volumes:
+      - yb_data:/home/yugabyte/yb_data
+    networks:
+      - shopify_network
+    command: [
+        'bin/yugabyted',
+        'start',
+        '--base_dir=/home/yugabyte/yb_data',
+        '--background=false',
+        '--master_flags',
+        'ysql_yb_enable_advisory_locks=true,allowed_preview_flags_csv=ysql_yb_enable_advisory_locks', # Add these flags for master
+        '--tserver_flags',
+        'ysql_yb_enable_advisory_locks=true,allowed_preview_flags_csv=ysql_yb_enable_advisory_locks', # Add these flags for tserver
+        # '--listen',
+        # '0.0.0.0',
+      ]
+    healthcheck: # Optional: Add a healthcheck for better orchestration
+      test: ['CMD', 'curl', '-f', 'http://yugabyte:7000'] # Check if YB-Master UI is up
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s # Give it some time to start up
+
+volumes:
+  yb_data:
+
+networks:
+  shopify_network:
+    name: shopify_network
+    driver: bridge

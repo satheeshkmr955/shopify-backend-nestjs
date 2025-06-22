@@ -1,0 +1,12 @@
+services:
+  adminer:
+    image: adminer:5.3.0
+    restart: always
+    networks:
+      - shopify_network
+    ports:
+      - 8080:8080
+
+networks:
+  shopify_network:
+    external: true
