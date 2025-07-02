@@ -16,6 +16,10 @@ import {
   UpdateSongSchema,
   UpdateSongDTO,
 } from './dto/song.schema';
+import {
+  Paginate,
+  PaginationParams,
+} from 'src/common/decorators/pagination.decorator';
 
 @Controller('songs')
 export class SongsController {
@@ -29,8 +33,8 @@ export class SongsController {
   }
 
   @Get()
-  findAll() {
-    return this.songsService.findAll();
+  findAll(@Paginate() pagination: PaginationParams) {
+    return this.songsService.findAll(pagination);
   }
 
   @Get(':id')

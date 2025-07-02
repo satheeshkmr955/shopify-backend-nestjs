@@ -3,6 +3,9 @@ import { Prisma } from '@prisma/client';
 
 import { CreateSongDTO, UpdateSongDTO } from './dto/song.schema';
 import { PrismaService } from 'src/prisma.service';
+import { PaginationParams } from 'src/common/decorators/pagination.decorator';
+import { findAllPaginate, PrismaModel } from 'src/common/utils/pagination.util';
+import type { SongArtists } from 'src/common/types/songs';
 
 @Injectable()
 export class SongsService {
@@ -38,8 +41,22 @@ export class SongsService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.song.findMany({ include: { artists: true } });
+  async findAll(pagination: PaginationParams) {
+    const model = this.prisma.song as unknown as PrismaModel<SongArtists>;
+
+    const query: Prisma.SongFindManyArgs = {
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      include: { artists: true },
+    };
+
+    const config = {
+      pagination: pagination,
+      model: model,
+      query: query,
+      afterType: 'id',
+    };
+
+    return await findAllPaginate<SongArtists>(config);
   }
 
   async findOne(id: string) {

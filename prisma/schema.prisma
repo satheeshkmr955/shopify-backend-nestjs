@@ -13,11 +13,15 @@ model Song {
   releasedDate DateTime
   duration     Int
   lyrics       String
-  artists      Artist[] @relation("SongArtists") // This creates a many-to-many link
+  artists      Artist[] @relation("SongArtists")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Artist {
-  id    String @id @default(nanoid())
-  name  String @unique
-  songs Song[] @relation("SongArtists")
+  id        String   @id @default(nanoid())
+  name      String   @unique
+  songs     Song[]   @relation("SongArtists")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
