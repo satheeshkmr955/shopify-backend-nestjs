@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 
 import { PlaylistService } from './playlist.service';
@@ -20,7 +22,10 @@ import {
   Paginate,
   PaginationParams,
 } from 'src/common/decorators/pagination.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RequestUser } from 'src/common/types/user.types';
 
+@UseGuards(JwtAuthGuard)
 @Controller('playlist')
 export class PlaylistController {
   constructor(private readonly playlistService: PlaylistService) {}
@@ -29,8 +34,10 @@ export class PlaylistController {
   create(
     @Body(new ZodValidationPipe(CreatePlaylistSchema))
     createPlaylistDTO: CreatePlaylistDTO,
+    @Request() req: RequestUser,
   ) {
-    return this.playlistService.create(createPlaylistDTO);
+    const user = req.user;
+    return this.playlistService.create(createPlaylistDTO, user);
   }
 
   @Get()

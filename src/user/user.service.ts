@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 
@@ -61,6 +62,23 @@ export class UserService {
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+
+  async findOneByEmail(email: string, addPassword = false) {
+    const query: Prisma.UserFindUniqueArgs = {
+      where: { email },
+      omit: { password: true },
+    };
+
+    if (addPassword && query.omit?.password) {
+      query.omit.password = false;
+    }
+
+    const user = await this.prisma.user.findUnique(query);
+    if (!user) {
+      throw new UnauthorizedException('Please check your credential');
     }
     return user;
   }

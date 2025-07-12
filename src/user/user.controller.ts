@@ -1,34 +1,34 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import {
-  CreateUserDTO,
-  CreateUserSchema,
-  UpdateUserDTO,
-  UpdateUserSchema,
-} from './dto/user.schema';
+import { UpdateUserDTO, UpdateUserSchema } from './dto/user.schema';
 import {
   Paginate,
   PaginationParams,
 } from 'src/common/decorators/pagination.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RequestUser } from 'src/common/types/user.types';
 
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(
-    @Body(new ZodValidationPipe(CreateUserSchema)) createUserDTO: CreateUserDTO,
+  @Get('profile')
+  getProfile(
+    @Request()
+    req: RequestUser,
   ) {
-    return this.userService.create(createUserDTO);
+    return req.user;
   }
 
   @Get()

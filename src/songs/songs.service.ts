@@ -5,7 +5,7 @@ import { CreateSongDTO, UpdateSongDTO } from './dto/song.schema';
 import { PrismaService } from 'src/prisma.service';
 import { PaginationParams } from 'src/common/decorators/pagination.decorator';
 import { findAllPaginate, PrismaModel } from 'src/common/utils/pagination.util';
-import type { SongArtists } from 'src/common/types/songs';
+import type { SongArtists } from 'src/common/types/songs.types';
 
 @Injectable()
 export class SongsService {

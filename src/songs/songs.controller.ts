@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 
 import { SongsService } from './songs.service';
@@ -20,7 +21,9 @@ import {
   Paginate,
   PaginationParams,
 } from 'src/common/decorators/pagination.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('songs')
 export class SongsController {
   constructor(private songsService: SongsService) {}

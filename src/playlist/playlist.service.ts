@@ -1,20 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreatePlaylistDTO, UpdatePlaylistDTO } from './dto/playlist.schema';
 import { PaginationParams } from 'src/common/decorators/pagination.decorator';
 import { findAllPaginate, PrismaModel } from 'src/common/utils/pagination.util';
 
-import type { PlaylistSong } from 'src/common/types/playlist';
-
-const userId = 'gJY_4F-8xRm9hIAgGQMTv';
+import type { PlaylistSong } from 'src/common/types/playlist.types';
 
 @Injectable()
 export class PlaylistService {
   constructor(private prisma: PrismaService) {}
 
-  async create(newPlaylistDto: CreatePlaylistDTO) {
+  async create(newPlaylistDto: CreatePlaylistDTO, user: User) {
     const { songs: songIds, ...restOfPlaylistData } = newPlaylistDto;
 
     let songConnectOperations: { id: string }[] | undefined;
@@ -28,14 +26,6 @@ export class PlaylistService {
         },
         select: { id: true },
       });
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User not found`);
     }
 
     const data: Prisma.PlaylistCreateInput = {
