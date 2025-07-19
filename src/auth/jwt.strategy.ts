@@ -20,7 +20,8 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload) {
-    return this.userService.findOneByEmail(payload.email);
+  async validate(payload: JwtPayload) {
+    const user = await this.userService.findOneByEmail(payload.email);
+    return { ...user, artistId: payload.artistId };
   }
 }

@@ -12,14 +12,21 @@ export class SongsService {
   constructor(private prisma: PrismaService) {}
 
   async create(newSongDto: CreateSongDTO) {
-    const { artists: artistNames, ...restOfSongData } = newSongDto;
+    const { artists: artistIds, ...restOfSongData } = newSongDto;
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: artistIds } },
+      select: { id: true, firstName: true, lastName: true },
+    });
 
     const artistConnectOperations = await Promise.all(
-      artistNames.map(async (name) => {
+      users.map(async (obj) => {
+        const { firstName = '', lastName = '', id = '' } = obj || {};
+        const name = `${firstName} ${lastName}`;
         const artist = await this.prisma.artist.upsert({
-          where: { name: name },
+          where: { name, id },
           update: {},
-          create: { name: name },
+          create: { name, id },
         });
         return { id: artist.id };
       }),
@@ -73,22 +80,25 @@ export class SongsService {
   async update(id: string, updateData: UpdateSongDTO) {
     await this.findOne(id);
 
-    const { artists: artistNames, ...restOfSongData } = updateData;
+    const { artists: artistIds, ...restOfSongData } = updateData;
 
-    let artistConnectOperations: { id: string }[] | undefined;
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: artistIds } },
+      select: { id: true, firstName: true, lastName: true },
+    });
 
-    if (artistNames && artistNames.length > 0) {
-      artistConnectOperations = await Promise.all(
-        artistNames.map(async (name) => {
-          const artist = await this.prisma.artist.upsert({
-            where: { name: name },
-            update: {},
-            create: { name: name },
-          });
-          return { id: artist.id };
-        }),
-      );
-    }
+    const artistConnectOperations = await Promise.all(
+      users.map(async (obj) => {
+        const { firstName = '', lastName = '', id = '' } = obj || {};
+        const name = `${firstName} ${lastName}`;
+        const artist = await this.prisma.artist.upsert({
+          where: { name, id },
+          update: {},
+          create: { name, id },
+        });
+        return { id: artist.id };
+      }),
+    );
 
     const data: Prisma.SongUpdateInput = {
       ...restOfSongData,

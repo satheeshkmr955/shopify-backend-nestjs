@@ -22,6 +22,7 @@ import {
   PaginationParams,
 } from 'src/common/decorators/pagination.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtArtistGuard } from 'src/auth/jwt.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('songs')
@@ -29,6 +30,7 @@ export class SongsController {
   constructor(private songsService: SongsService) {}
 
   @Post()
+  @UseGuards(JwtArtistGuard)
   create(
     @Body(new ZodValidationPipe(CreateSongSchema)) createSongDTO: CreateSongDTO,
   ) {
