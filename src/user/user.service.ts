@@ -21,6 +21,7 @@ export class UserService {
   async create(newUserDto: CreateUserDTO) {
     const isEmailExists = await this.prisma.user.findUnique({
       where: { email: newUserDto.email },
+      omit: { password: true },
     });
 
     if (isEmailExists) {
@@ -114,6 +115,14 @@ export class UserService {
     return await this.prisma.user.update({
       where: { id },
       data,
+      omit: { password: true },
+    });
+  }
+
+  async updateSecretKey(id: string, secret: string | null, enable: boolean) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { twoFASecret: secret, enable2FA: enable },
       omit: { password: true },
     });
   }

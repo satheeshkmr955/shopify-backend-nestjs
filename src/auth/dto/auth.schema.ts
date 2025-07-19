@@ -9,3 +9,9 @@ export const LoginSchema = z.object({
 });
 
 export type LoginDTO = z.infer<typeof LoginSchema>;
+
+export const ValidateSchema = z.object({
+  token: z.string().min(1, 'Please enter token'),
+});
+
+export type ValidateDTO = z.infer<typeof ValidateSchema>;
