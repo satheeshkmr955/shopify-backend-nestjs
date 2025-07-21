@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ArtistModule } from './artist/artist.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ArtistModule } from './artist/artist.module';
     UserModule,
     AuthModule,
     ArtistModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
