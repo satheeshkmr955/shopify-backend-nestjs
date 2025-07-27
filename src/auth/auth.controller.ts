@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Request,
@@ -52,7 +51,7 @@ export class AuthController {
     return this.authService.enable2FA(req.user.id);
   }
 
-  @Get('disable-2fa')
+  @Post('disable-2fa')
   @UseGuards(JwtAuthGuard)
   disable2FA(
     @Request()

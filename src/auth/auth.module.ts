@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { JWTStrategy } from './jwt.strategy';
+import { AuthResolver } from './auth.resolvers';
 
 @Module({
   imports: [
@@ -26,6 +27,12 @@ import { JWTStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService, JWTStrategy, ArtistService],
+  providers: [
+    AuthService,
+    UserService,
+    JWTStrategy,
+    ArtistService,
+    AuthResolver,
+  ],
 })
 export class AuthModule {}

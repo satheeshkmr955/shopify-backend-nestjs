@@ -8,6 +8,22 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export class CreateUserInput {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+}
+
+export class LoginInput {
+    email: string;
+    password: string;
+}
+
+export class ValidateInput {
+    token: string;
+}
+
 export class PaginateInput {
     take?: Nullable<number>;
     after?: Nullable<string>;
@@ -62,6 +78,42 @@ export class Artist {
     updatedAt: DateTimeISO;
 }
 
+export class Enable2FAType {
+    secret: string;
+}
+
+export class ValidateType {
+    verified: boolean;
+}
+
+export abstract class IMutation {
+    abstract signup(input: CreateUserInput): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract login(input: LoginInput): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract validate2FA(input: ValidateInput): Nullable<ValidateType> | Promise<Nullable<ValidateType>>;
+
+    abstract enable2FA(): Nullable<Enable2FAType> | Promise<Nullable<Enable2FAType>>;
+
+    abstract disable2FA(): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract createPlaylist(input: CreatePlaylistInput): Playlist | Promise<Playlist>;
+
+    abstract updatePlaylist(input: UpdatePlaylistInput): Playlist | Promise<Playlist>;
+
+    abstract deletePlaylist(input: IDInput): Playlist | Promise<Playlist>;
+
+    abstract createSong(input: CreateSongInput): Song | Promise<Song>;
+
+    abstract updateSong(input: UpdateSongInput): Song | Promise<Song>;
+
+    abstract deleteSong(input: IDInput): Song | Promise<Song>;
+
+    abstract updateUser(input: UpdateUserInput): User | Promise<User>;
+
+    abstract deleteUser(input: IDInput): User | Promise<User>;
+}
+
 export class PaginationInfo {
     take: number;
     after?: Nullable<string>;
@@ -98,24 +150,6 @@ export abstract class IQuery {
     abstract users(input?: Nullable<PaginateInput>): PaginatedUsers | Promise<PaginatedUsers>;
 }
 
-export abstract class IMutation {
-    abstract createPlaylist(input: CreatePlaylistInput): Playlist | Promise<Playlist>;
-
-    abstract updatePlaylist(input: UpdatePlaylistInput): Playlist | Promise<Playlist>;
-
-    abstract deletePlaylist(input: IDInput): Playlist | Promise<Playlist>;
-
-    abstract createSong(input: CreateSongInput): Song | Promise<Song>;
-
-    abstract updateSong(input: UpdateSongInput): Song | Promise<Song>;
-
-    abstract deleteSong(input: IDInput): Song | Promise<Song>;
-
-    abstract updateUser(input: UpdateUserInput): User | Promise<User>;
-
-    abstract deleteUser(input: IDInput): User | Promise<User>;
-}
-
 export class Song {
     id: string;
     title: string;
@@ -143,6 +177,7 @@ export class User {
     playlists: Playlist[];
     createdAt: DateTimeISO;
     updatedAt: DateTimeISO;
+    accessToken?: Nullable<string>;
 }
 
 export class PaginatedUsers {

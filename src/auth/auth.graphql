@@ -1,0 +1,33 @@
+scalar DateTime
+
+type Enable2FAType {
+  secret: String!
+}
+
+type ValidateType {
+  verified: Boolean!
+}
+
+type Mutation {
+  signup(input: CreateUserInput!): User
+  login(input: LoginInput!): User
+  validate2FA(input: ValidateInput!): ValidateType
+  enable2FA: Enable2FAType
+  disable2FA: User
+}
+
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input ValidateInput {
+  token: String!
+}

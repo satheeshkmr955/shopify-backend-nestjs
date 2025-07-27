@@ -21,6 +21,8 @@ type User {
   playlists: [Playlist!]!
   createdAt: DateTime!
   updatedAt: DateTime!
+
+  accessToken: String
 }
 
 type PaginatedUsers {
