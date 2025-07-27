@@ -15,6 +15,7 @@ import { AppService } from './app.service';
 import { ArtistModule } from './artist/artist.module';
 import { EventsModule } from './events/events.module';
 import { GraphQLBadRequestFilter } from './common/filters/graphql-bad-request.filter';
+import { RequestUser } from './common/types/user.types';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { GraphQLBadRequestFilter } from './common/filters/graphql-bad-request.fi
       driver: YogaDriver,
       typePaths: ['./**/*.graphql'],
       resolvers: { DateTime: DateTimeISOResolver },
-      context: ({ req, res }: { req: Request; res: Response }) => ({
+      context: ({ req, res }: { req: RequestUser; res: Response }) => ({
         req,
         res,
       }),

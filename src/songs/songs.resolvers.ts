@@ -26,8 +26,8 @@ export class SongResolver {
   }
 
   @Query('song')
-  async getSong(@Args('input') { id }: { id: string }) {
-    return await this.songService.findOne(id);
+  async getSong(@Args('input') input: IDInput) {
+    return await this.songService.findOne(input.id);
   }
 
   @Mutation(() => Song)

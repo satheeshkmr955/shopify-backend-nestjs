@@ -17,6 +17,7 @@ export const UpdateUserSchema = CreateUserSchema.partial()
     email: true,
   })
   .extend({
+    id: z.string().min(1, 'Id cannot be empty'),
     playlists: z
       .array(z.string().min(1, 'Playlist cannot be empty'))
       .optional(),

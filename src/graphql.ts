@@ -34,6 +34,15 @@ export class UpdateSongInput {
     lyrics?: Nullable<string>;
 }
 
+export class UpdateUserInput {
+    id: string;
+    firstName?: Nullable<string>;
+    lastName?: Nullable<string>;
+    twoFASecret?: Nullable<string>;
+    enable2FA?: Nullable<boolean>;
+    playlists?: Nullable<string[]>;
+}
+
 export class Artist {
     id: string;
     name: string;
@@ -78,6 +87,12 @@ export abstract class IQuery {
     abstract song(input: IDInput): Nullable<Song> | Promise<Nullable<Song>>;
 
     abstract songs(input?: Nullable<PaginateInput>): PaginatedSongs | Promise<PaginatedSongs>;
+
+    abstract profile(): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract user(input: IDInput): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(input?: Nullable<PaginateInput>): PaginatedUsers | Promise<PaginatedUsers>;
 }
 
 export abstract class IMutation {
@@ -86,6 +101,10 @@ export abstract class IMutation {
     abstract updateSong(input: UpdateSongInput): Song | Promise<Song>;
 
     abstract deleteSong(input: IDInput): Song | Promise<Song>;
+
+    abstract updateUser(input: UpdateUserInput): User | Promise<User>;
+
+    abstract deleteUser(input: IDInput): User | Promise<User>;
 }
 
 export class User {
@@ -98,6 +117,11 @@ export class User {
     playlists: Playlist[];
     createdAt: DateTimeISO;
     updatedAt: DateTimeISO;
+}
+
+export class PaginatedUsers {
+    items: User[];
+    pagination: PaginationInfo;
 }
 
 export type DateTimeISO = any;

@@ -1,5 +1,16 @@
 scalar DateTime
 
+type PaginationInfo {
+  take: Int!
+  after: String
+  hasNextPage: Boolean!
+}
+
+input PaginateInput {
+  take: Int
+  after: String
+}
+
 type User {
   id: ID!
   firstName: String!
@@ -10,4 +21,33 @@ type User {
   playlists: [Playlist!]!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type PaginatedUsers {
+  items: [User!]!
+  pagination: PaginationInfo!
+}
+
+type Query {
+  profile: User
+  user(input: IDInput!): User
+  users(input: PaginateInput): PaginatedUsers!
+}
+
+type Mutation {
+  updateUser(input: UpdateUserInput!): User!
+  deleteUser(input: IDInput!): User!
+}
+
+input IDInput {
+  id: ID!
+}
+
+input UpdateUserInput {
+  id: ID!
+  firstName: String
+  lastName: String
+  twoFASecret: String
+  enable2FA: Boolean
+  playlists: [String!]
 }
