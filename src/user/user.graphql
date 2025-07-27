@@ -1,0 +1,13 @@
+scalar DateTime
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  twoFASecret: String
+  enable2FA: Boolean!
+  playlists: [Playlist!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}

@@ -80,7 +80,7 @@ export class SongsService {
   async update(id: string, updateData: UpdateSongDTO) {
     await this.findOne(id);
 
-    const { artists: artistIds, ...restOfSongData } = updateData;
+    const { artists: artistIds = [], ...restOfSongData } = updateData;
 
     const users = await this.prisma.user.findMany({
       where: { id: { in: artistIds } },
@@ -108,7 +108,7 @@ export class SongsService {
       data.releasedDate = new Date(restOfSongData.releasedDate);
     }
 
-    if (artistConnectOperations) {
+    if (artistConnectOperations.length) {
       data.artists = {
         set: artistConnectOperations,
       };

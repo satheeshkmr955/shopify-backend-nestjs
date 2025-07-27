@@ -1,0 +1,61 @@
+scalar DateTime
+
+type PaginationInfo {
+  take: Int!
+  after: String
+  hasNextPage: Boolean!
+}
+
+input PaginateInput {
+  take: Int
+  after: String
+}
+
+type Song {
+  id: ID!
+  title: String!
+  releasedDate: DateTime!
+  duration: Int!
+  lyrics: String!
+  artists: [Artist!]!
+  playlist: Playlist
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PaginatedSongs {
+  items: [Song!]!
+  pagination: PaginationInfo!
+}
+
+type Query {
+  song(input: IDInput!): Song
+  songs(input: PaginateInput): PaginatedSongs!
+}
+
+type Mutation {
+  createSong(input: CreateSongInput!): Song!
+  updateSong(input: UpdateSongInput!): Song!
+  deleteSong(input: IDInput!): Song!
+}
+
+input IDInput {
+  id: ID!
+}
+
+input CreateSongInput {
+  title: String!
+  artists: [String!]!
+  releasedDate: DateTime!
+  duration: Int!
+  lyrics: String!
+}
+
+input UpdateSongInput {
+  id: ID!
+  title: String
+  artists: [String!]
+  releasedDate: DateTime
+  duration: Int
+  lyrics: String
+}
