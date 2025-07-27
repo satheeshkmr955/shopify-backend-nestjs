@@ -7,6 +7,7 @@ import { PaginationParams } from 'src/common/decorators/pagination.decorator';
 import { findAllPaginate, PrismaModel } from 'src/common/utils/pagination.util';
 
 import type { PlaylistSong } from 'src/common/types/playlist.types';
+import type { UserWithArtistID } from 'src/common/types/user.types';
 
 @Injectable()
 export class PlaylistService {
@@ -28,9 +29,12 @@ export class PlaylistService {
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { artistId, ...restOfUser } = user as UserWithArtistID;
+
     const data: Prisma.PlaylistCreateInput = {
       name: restOfPlaylistData.name,
-      user: { connect: user },
+      user: { connect: restOfUser },
     };
 
     if (songConnectOperations) {
@@ -41,7 +45,7 @@ export class PlaylistService {
 
     return this.prisma.playlist.create({
       data,
-      include: { songs: true },
+      include: { songs: true, user: true },
     });
   }
 
@@ -50,7 +54,7 @@ export class PlaylistService {
 
     const query: Prisma.PlaylistFindManyArgs = {
       orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
-      include: { songs: true },
+      include: { songs: true, user: true },
     };
 
     const config = {
@@ -66,7 +70,7 @@ export class PlaylistService {
   async findOne(id: string) {
     const playlist = await this.prisma.playlist.findUnique({
       where: { id },
-      include: { songs: true },
+      include: { songs: true, user: true },
     });
     if (!playlist) {
       throw new NotFoundException(`Playlist with ID ${id} not found`);
@@ -105,7 +109,7 @@ export class PlaylistService {
     return await this.prisma.playlist.update({
       where: { id },
       data,
-      include: { songs: true },
+      include: { songs: true, user: true },
     });
   }
 
@@ -114,7 +118,7 @@ export class PlaylistService {
 
     return await this.prisma.playlist.delete({
       where: { id },
-      include: { songs: true },
+      include: { songs: true, user: true },
     });
   }
 }

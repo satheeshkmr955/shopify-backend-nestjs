@@ -17,6 +17,17 @@ export class IDInput {
     id: string;
 }
 
+export class CreatePlaylistInput {
+    name: string;
+    songs?: Nullable<string[]>;
+}
+
+export class UpdatePlaylistInput {
+    id: string;
+    name?: Nullable<string>;
+    songs?: Nullable<string[]>;
+}
+
 export class CreateSongInput {
     title: string;
     artists: string[];
@@ -51,6 +62,12 @@ export class Artist {
     updatedAt: DateTimeISO;
 }
 
+export class PaginationInfo {
+    take: number;
+    after?: Nullable<string>;
+    hasNextPage: boolean;
+}
+
 export class Playlist {
     id: string;
     name: string;
@@ -60,10 +77,43 @@ export class Playlist {
     updatedAt: DateTimeISO;
 }
 
-export class PaginationInfo {
-    take: number;
-    after?: Nullable<string>;
-    hasNextPage: boolean;
+export class PaginatedPlaylist {
+    items: Playlist[];
+    pagination: PaginationInfo;
+}
+
+export abstract class IQuery {
+    abstract playlist(input: IDInput): Nullable<Playlist> | Promise<Nullable<Playlist>>;
+
+    abstract playlists(input?: Nullable<PaginateInput>): PaginatedPlaylist | Promise<PaginatedPlaylist>;
+
+    abstract song(input: IDInput): Nullable<Song> | Promise<Nullable<Song>>;
+
+    abstract songs(input?: Nullable<PaginateInput>): PaginatedSongs | Promise<PaginatedSongs>;
+
+    abstract profile(): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract user(input: IDInput): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(input?: Nullable<PaginateInput>): PaginatedUsers | Promise<PaginatedUsers>;
+}
+
+export abstract class IMutation {
+    abstract createPlaylist(input: CreatePlaylistInput): Playlist | Promise<Playlist>;
+
+    abstract updatePlaylist(input: UpdatePlaylistInput): Playlist | Promise<Playlist>;
+
+    abstract deletePlaylist(input: IDInput): Playlist | Promise<Playlist>;
+
+    abstract createSong(input: CreateSongInput): Song | Promise<Song>;
+
+    abstract updateSong(input: UpdateSongInput): Song | Promise<Song>;
+
+    abstract deleteSong(input: IDInput): Song | Promise<Song>;
+
+    abstract updateUser(input: UpdateUserInput): User | Promise<User>;
+
+    abstract deleteUser(input: IDInput): User | Promise<User>;
 }
 
 export class Song {
@@ -81,30 +131,6 @@ export class Song {
 export class PaginatedSongs {
     items: Song[];
     pagination: PaginationInfo;
-}
-
-export abstract class IQuery {
-    abstract song(input: IDInput): Nullable<Song> | Promise<Nullable<Song>>;
-
-    abstract songs(input?: Nullable<PaginateInput>): PaginatedSongs | Promise<PaginatedSongs>;
-
-    abstract profile(): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract user(input: IDInput): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract users(input?: Nullable<PaginateInput>): PaginatedUsers | Promise<PaginatedUsers>;
-}
-
-export abstract class IMutation {
-    abstract createSong(input: CreateSongInput): Song | Promise<Song>;
-
-    abstract updateSong(input: UpdateSongInput): Song | Promise<Song>;
-
-    abstract deleteSong(input: IDInput): Song | Promise<Song>;
-
-    abstract updateUser(input: UpdateUserInput): User | Promise<User>;
-
-    abstract deleteUser(input: IDInput): User | Promise<User>;
 }
 
 export class User {

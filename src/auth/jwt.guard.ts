@@ -8,7 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 import { JwtPayload } from 'src/common/types/jwt.types';
-import { RequestUser } from 'src/common/types/user.types';
+import { RequestUser, UserWithArtistID } from 'src/common/types/user.types';
 
 @Injectable()
 export class JwtArtistGuard extends AuthGuard('jwt') {
@@ -23,13 +23,13 @@ export class JwtArtistGuard extends AuthGuard('jwt') {
     return ctx.getContext<{ req: RequestUser }>().req;
   }
 
-  handleRequest<TUser = JwtPayload>(err: any, user: any): TUser {
+  handleRequest<TUser = JwtPayload>(err: any, user: UserWithArtistID): TUser {
     if (err || !user) {
       throw err || new UnauthorizedException();
     }
 
     if (user?.artistId) {
-      return user;
+      return user as TUser;
     }
     throw err || new UnauthorizedException();
   }

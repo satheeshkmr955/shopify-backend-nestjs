@@ -7,6 +7,8 @@ export const CreatePlaylistSchema = z.object({
 
 export type CreatePlaylistDTO = z.infer<typeof CreatePlaylistSchema>;
 
-export const UpdatePlaylistSchema = CreatePlaylistSchema.partial();
+export const UpdatePlaylistSchema = CreatePlaylistSchema.partial().extend({
+  id: z.string().min(1, 'Id cannot be empty'),
+});
 
 export type UpdatePlaylistDTO = z.infer<typeof UpdatePlaylistSchema>;
