@@ -1,0 +1,18 @@
+services:
+  redis-shopify:
+    image: redis:8.2.0
+    container_name: redis-shopify
+    restart: unless-stopped
+    ports:
+      - '6380:6379'
+    networks:
+      - shopify_network
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+
+networks:
+  shopify_network:
+    external: true

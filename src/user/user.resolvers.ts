@@ -1,4 +1,11 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { IDInput, User } from 'src/graphql';
@@ -7,13 +14,18 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { UserService } from './user.service';
+import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
 import { UpdateUserDTO, UpdateUserSchema } from './dto/user.schema';
 import { RequestUser } from 'src/common/types/user.types';
+import { GET_USER_BY_ID } from 'src/constants/subscription';
 
 @Resolver()
 @UseGuards(JwtAuthGuard)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly redisPubSubService: RedisPubSubService,
+  ) {}
 
   @Query('profile')
   getProfile(@Context() context: { req: RequestUser; res: Response }) {
@@ -28,7 +40,9 @@ export class UserResolver {
 
   @Query('user')
   async getUser(@Args('input') input: IDInput) {
-    return await this.userService.findOne(input.id);
+    const getUserById = await this.userService.findOne(input.id);
+    this.redisPubSubService.pubSub.publish(GET_USER_BY_ID, { getUserById });
+    return getUserById;
   }
 
   @Mutation(() => User)
@@ -45,5 +59,10 @@ export class UserResolver {
     input: IDInput,
   ) {
     return await this.userService.remove(input.id);
+  }
+
+  @Subscription(() => User)
+  getUserById() {
+    return this.redisPubSubService.pubSub.subscribe(GET_USER_BY_ID);
   }
 }

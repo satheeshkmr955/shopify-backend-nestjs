@@ -1,7 +1,8 @@
 services:
-  yugabyte:
+  yugabyte-shopify:
     image: yugabytedb/yugabyte:2.25.2.0-b359
-    container_name: yugabyte
+    container_name: yugabyte-shopify
+    restart: unless-stopped
     ports:
       - '7000:7000' # YB-Master UI and RPC
       - '9001:9000' # YB-TServer UI and RPC
@@ -25,7 +26,7 @@ services:
         # '0.0.0.0',
       ]
     healthcheck: # Optional: Add a healthcheck for better orchestration
-      test: ['CMD', 'curl', '-f', 'http://yugabyte:7000'] # Check if YB-Master UI is up
+      test: ['CMD', 'curl', '-f', 'http://yugabyte-shopify:7000'] # Check if YB-Master UI is up
       interval: 30s
       timeout: 10s
       retries: 5

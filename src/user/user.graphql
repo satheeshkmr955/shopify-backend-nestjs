@@ -41,6 +41,10 @@ type Mutation {
   deleteUser(input: IDInput!): User!
 }
 
+type Subscription {
+  getUserById: User
+}
+
 input IDInput {
   id: ID!
 }

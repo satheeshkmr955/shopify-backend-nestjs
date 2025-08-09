@@ -8,3 +8,9 @@ export interface RequestUser extends Request {
 export type UserWithArtistID = User & {
   artistId?: string;
 };
+
+export type UserWithoutPassword = Omit<User, 'password'>;
+
+export interface GetUserById {
+  getUserById: UserWithoutPassword;
+}

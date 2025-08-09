@@ -185,5 +185,9 @@ export class PaginatedUsers {
     pagination: PaginationInfo;
 }
 
+export abstract class ISubscription {
+    abstract getUserById(): Nullable<User> | Promise<Nullable<User>>;
+}
+
 export type DateTimeISO = any;
 type Nullable<T> = T | null;
