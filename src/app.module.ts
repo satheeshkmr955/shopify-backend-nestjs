@@ -13,7 +13,6 @@ import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ArtistModule } from './artist/artist.module';
-import { EventsModule } from './events/events.module';
 import { RedisPubSubModule } from './redisPubSub/redisPubSub.module';
 import { GraphQLBadRequestFilter } from './common/filters/graphql-bad-request.filter';
 import { RequestUser } from './common/types/user.types';
@@ -42,7 +41,6 @@ import { RequestUser } from './common/types/user.types';
     UserModule,
     AuthModule,
     ArtistModule,
-    EventsModule,
     RedisPubSubModule,
   ],
   controllers: [AppController],
