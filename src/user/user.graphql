@@ -43,6 +43,7 @@ type Mutation {
 
 type Subscription {
   userUpdated: User
+  userDeleted: User
 }
 
 input IDInput {

@@ -16,7 +16,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UserService } from './user.service';
 import { UpdateUserDTO, UpdateUserSchema } from './dto/user.schema';
 import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
-import { USER_UPDATED } from 'src/constants/events.contstant';
+import { USER_DELETED, USER_UPDATED } from 'src/constants/events.constant';
 
 import { RequestUser } from 'src/common/types/user.types';
 
@@ -59,11 +59,18 @@ export class UserResolver {
     @Args('input')
     input: IDInput,
   ) {
-    return await this.userService.remove(input.id);
+    const userDeleted = await this.userService.remove(input.id);
+    this.redisPubSubService.pubSub.publish(USER_DELETED, { userDeleted });
+    return userDeleted;
   }
 
   @Subscription(() => User)
   userUpdated() {
     return this.redisPubSubService.pubSub.subscribe(USER_UPDATED);
+  }
+
+  @Subscription(() => User)
+  userDeleted() {
+    return this.redisPubSubService.pubSub.subscribe(USER_DELETED);
   }
 }

@@ -118,6 +118,8 @@ export abstract class ISubscription {
     abstract userCreated(): Nullable<User> | Promise<Nullable<User>>;
 
     abstract userUpdated(): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract userDeleted(): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export class PaginationInfo {

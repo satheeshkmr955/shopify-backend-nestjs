@@ -229,6 +229,7 @@ export type Song = {
 export type Subscription = {
   __typename?: 'Subscription';
   userCreated?: Maybe<User>;
+  userDeleted?: Maybe<User>;
   userUpdated?: Maybe<User>;
 };
 
@@ -506,6 +507,7 @@ export type SongResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   userCreated?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "userCreated", ParentType, ContextType>;
+  userDeleted?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "userDeleted", ParentType, ContextType>;
   userUpdated?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "userUpdated", ParentType, ContextType>;
 };
 

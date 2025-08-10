@@ -21,7 +21,7 @@ import {
   ValidateSchema,
 } from './dto/auth.schema';
 import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
-import { USER_CREATED } from 'src/constants/events.contstant';
+import { USER_CREATED } from 'src/constants/events.constant';
 
 import { RequestUser } from 'src/common/types/user.types';
 
