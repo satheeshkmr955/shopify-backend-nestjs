@@ -1,4 +1,10 @@
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { Enable2FAType, User, ValidateType } from 'src/graphql';
@@ -14,6 +20,9 @@ import {
   ValidateDTO,
   ValidateSchema,
 } from './dto/auth.schema';
+import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
+import { USER_CREATED } from 'src/constants/events.contstant';
+
 import { RequestUser } from 'src/common/types/user.types';
 
 @Resolver()
@@ -21,6 +30,7 @@ export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly redisPubSubService: RedisPubSubService,
   ) {}
 
   @Mutation(() => User)
@@ -28,7 +38,9 @@ export class AuthResolver {
     @Args('input', new ZodValidationPipe(CreateUserSchema))
     input: CreateUserDTO,
   ) {
-    return await this.userService.create(input);
+    const userCreated = await this.userService.create(input);
+    this.redisPubSubService.pubSub.publish(USER_CREATED, { userCreated });
+    return userCreated;
   }
 
   @Mutation(() => User)
@@ -62,5 +74,10 @@ export class AuthResolver {
       context?.req?.user?.id,
       input.token,
     );
+  }
+
+  @Subscription(() => User)
+  userCreated() {
+    return this.redisPubSubService.pubSub.subscribe(USER_CREATED);
   }
 }

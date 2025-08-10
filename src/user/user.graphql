@@ -18,7 +18,7 @@ type User {
   email: String!
   twoFASecret: String
   enable2FA: Boolean!
-  playlists: [Playlist!]!
+  playlists: [Playlist!]
   createdAt: DateTime!
   updatedAt: DateTime!
 
@@ -42,7 +42,7 @@ type Mutation {
 }
 
 type Subscription {
-  getUserById: User
+  userUpdated: User
 }
 
 input IDInput {

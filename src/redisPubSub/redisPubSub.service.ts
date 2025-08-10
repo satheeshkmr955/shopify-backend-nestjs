@@ -10,7 +10,7 @@ import {
 import { dynamicImport } from 'src/utils/dynamicImport';
 
 import type SuperJSON from 'superjson';
-import { PubSubEventMap } from 'src/common/types/pubsub.types';
+import { PubSubEventMap } from 'src/generated/pubsub-event-map';
 
 @Injectable()
 export class RedisPubSubService implements OnModuleInit, OnModuleDestroy {

@@ -114,6 +114,12 @@ export abstract class IMutation {
     abstract deleteUser(input: IDInput): User | Promise<User>;
 }
 
+export abstract class ISubscription {
+    abstract userCreated(): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract userUpdated(): Nullable<User> | Promise<Nullable<User>>;
+}
+
 export class PaginationInfo {
     take: number;
     after?: Nullable<string>;
@@ -174,7 +180,7 @@ export class User {
     email: string;
     twoFASecret?: Nullable<string>;
     enable2FA: boolean;
-    playlists: Playlist[];
+    playlists?: Nullable<Playlist[]>;
     createdAt: DateTimeISO;
     updatedAt: DateTimeISO;
     accessToken?: Nullable<string>;
@@ -183,10 +189,6 @@ export class User {
 export class PaginatedUsers {
     items: User[];
     pagination: PaginationInfo;
-}
-
-export abstract class ISubscription {
-    abstract getUserById(): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export type DateTimeISO = any;

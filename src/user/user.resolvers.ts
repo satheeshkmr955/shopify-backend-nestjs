@@ -14,10 +14,11 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { UserService } from './user.service';
-import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
 import { UpdateUserDTO, UpdateUserSchema } from './dto/user.schema';
+import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
+import { USER_UPDATED } from 'src/constants/events.contstant';
+
 import { RequestUser } from 'src/common/types/user.types';
-import { GET_USER_BY_ID } from 'src/constants/subscription';
 
 @Resolver()
 @UseGuards(JwtAuthGuard)
@@ -40,9 +41,7 @@ export class UserResolver {
 
   @Query('user')
   async getUser(@Args('input') input: IDInput) {
-    const getUserById = await this.userService.findOne(input.id);
-    this.redisPubSubService.pubSub.publish(GET_USER_BY_ID, { getUserById });
-    return getUserById;
+    return await this.userService.findOne(input.id);
   }
 
   @Mutation(() => User)
@@ -50,7 +49,9 @@ export class UserResolver {
     @Args('input', new ZodValidationPipe(UpdateUserSchema))
     input: UpdateUserDTO,
   ) {
-    return await this.userService.update(input.id, input);
+    const userUpdated = await this.userService.update(input.id, input);
+    this.redisPubSubService.pubSub.publish(USER_UPDATED, { userUpdated });
+    return userUpdated;
   }
 
   @Mutation(() => User)
@@ -62,7 +63,7 @@ export class UserResolver {
   }
 
   @Subscription(() => User)
-  getUserById() {
-    return this.redisPubSubService.pubSub.subscribe(GET_USER_BY_ID);
+  userUpdated() {
+    return this.redisPubSubService.pubSub.subscribe(USER_UPDATED);
   }
 }

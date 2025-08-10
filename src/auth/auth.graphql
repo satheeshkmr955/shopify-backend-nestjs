@@ -16,6 +16,10 @@ type Mutation {
   disable2FA: User
 }
 
+type Subscription {
+  userCreated: User
+}
+
 input CreateUserInput {
   firstName: String!
   lastName: String!

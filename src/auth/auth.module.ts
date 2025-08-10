@@ -10,11 +10,13 @@ import { UserService } from 'src/user/user.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { JWTStrategy } from './jwt.strategy';
 import { AuthResolver } from './auth.resolvers';
+import { RedisPubSubModule } from 'src/redisPubSub/redisPubSub.module';
 
 @Module({
   imports: [
     PrismaModule,
     UserModule,
+    RedisPubSubModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
