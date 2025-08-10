@@ -14,7 +14,7 @@ input PaginateInput {
 type Playlist {
   id: ID!
   name: String!
-  songs: [Song!]!
+  songs: [Song!]
   user: User!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -34,6 +34,12 @@ type Mutation {
   createPlaylist(input: CreatePlaylistInput!): Playlist!
   updatePlaylist(input: UpdatePlaylistInput!): Playlist!
   deletePlaylist(input: IDInput!): Playlist!
+}
+
+type Subscription {
+  playlistCreated: Playlist
+  playlistUpdated: Playlist
+  playlistDeleted: Playlist
 }
 
 input IDInput {

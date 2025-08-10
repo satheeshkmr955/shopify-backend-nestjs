@@ -1,4 +1,11 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 import { IDInput, Playlist } from 'src/graphql';
@@ -13,12 +20,22 @@ import {
   UpdatePlaylistDTO,
   UpdatePlaylistSchema,
 } from './dto/playlist.schema';
+import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
+import {
+  PLAYLIST_CREATED,
+  PLAYLIST_DELETED,
+  PLAYLIST_UPDATED,
+} from 'src/constants/events.constant';
+
 import { RequestUser } from 'src/common/types/user.types';
 
 @Resolver()
 @UseGuards(JwtAuthGuard)
 export class PlaylistResolver {
-  constructor(private readonly playlistService: PlaylistService) {}
+  constructor(
+    private readonly playlistService: PlaylistService,
+    private readonly redisPubSubService: RedisPubSubService,
+  ) {}
 
   @Query('playlists')
   async getPlaylists(@Args('input') pagination: PaginationParams) {
@@ -36,7 +53,12 @@ export class PlaylistResolver {
     input: CreatePlaylistDTO,
     @Context() context: { req: RequestUser; res: Response },
   ) {
-    return await this.playlistService.create(input, context.req.user);
+    const user = context.req.user;
+    const playlistCreated = await this.playlistService.create(input, user);
+    this.redisPubSubService.pubSub.publish(PLAYLIST_CREATED, {
+      playlistCreated,
+    });
+    return playlistCreated;
   }
 
   @Mutation(() => Playlist)
@@ -44,7 +66,11 @@ export class PlaylistResolver {
     @Args('input', new ZodValidationPipe(UpdatePlaylistSchema))
     input: UpdatePlaylistDTO,
   ) {
-    return await this.playlistService.update(input.id, input);
+    const playlistUpdated = await this.playlistService.update(input.id, input);
+    this.redisPubSubService.pubSub.publish(PLAYLIST_UPDATED, {
+      playlistUpdated,
+    });
+    return playlistUpdated;
   }
 
   @Mutation(() => Playlist)
@@ -52,6 +78,25 @@ export class PlaylistResolver {
     @Args('input')
     input: IDInput,
   ) {
-    return await this.playlistService.remove(input.id);
+    const playlistDeleted = await this.playlistService.remove(input.id);
+    this.redisPubSubService.pubSub.publish(PLAYLIST_DELETED, {
+      playlistDeleted,
+    });
+    return playlistDeleted;
+  }
+
+  @Subscription(() => Playlist)
+  playlistCreated() {
+    return this.redisPubSubService.pubSub.subscribe(PLAYLIST_CREATED);
+  }
+
+  @Subscription(() => Playlist)
+  playlistUpdated() {
+    return this.redisPubSubService.pubSub.subscribe(PLAYLIST_UPDATED);
+  }
+
+  @Subscription(() => Playlist)
+  playlistDeleted() {
+    return this.redisPubSubService.pubSub.subscribe(PLAYLIST_DELETED);
   }
 }

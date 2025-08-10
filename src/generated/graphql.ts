@@ -22,7 +22,7 @@ export type Artist = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  songs: Array<Song>;
+  songs?: Maybe<Array<Song>>;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -167,7 +167,7 @@ export type Playlist = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  songs: Array<Song>;
+  songs?: Maybe<Array<Song>>;
   updatedAt: Scalars['DateTime']['output'];
   user: User;
 };
@@ -215,7 +215,7 @@ export type QueryUsersArgs = {
 
 export type Song = {
   __typename?: 'Song';
-  artists: Array<Artist>;
+  artists?: Maybe<Array<Artist>>;
   createdAt: Scalars['DateTime']['output'];
   duration: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
@@ -228,6 +228,9 @@ export type Song = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  playlistCreated?: Maybe<Playlist>;
+  playlistDeleted?: Maybe<Playlist>;
+  playlistUpdated?: Maybe<Playlist>;
   userCreated?: Maybe<User>;
   userDeleted?: Maybe<User>;
   userUpdated?: Maybe<User>;
@@ -417,7 +420,7 @@ export type ArtistResolvers<ContextType = any, ParentType extends ResolversParen
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  songs?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType>;
+  songs?: Resolver<Maybe<Array<ResolversTypes['Song']>>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -476,7 +479,7 @@ export type PlaylistResolvers<ContextType = any, ParentType extends ResolversPar
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  songs?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType>;
+  songs?: Resolver<Maybe<Array<ResolversTypes['Song']>>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -493,7 +496,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type SongResolvers<ContextType = any, ParentType extends ResolversParentTypes['Song'] = ResolversParentTypes['Song']> = {
-  artists?: Resolver<Array<ResolversTypes['Artist']>, ParentType, ContextType>;
+  artists?: Resolver<Maybe<Array<ResolversTypes['Artist']>>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   duration?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -506,6 +509,9 @@ export type SongResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  playlistCreated?: SubscriptionResolver<Maybe<ResolversTypes['Playlist']>, "playlistCreated", ParentType, ContextType>;
+  playlistDeleted?: SubscriptionResolver<Maybe<ResolversTypes['Playlist']>, "playlistDeleted", ParentType, ContextType>;
+  playlistUpdated?: SubscriptionResolver<Maybe<ResolversTypes['Playlist']>, "playlistUpdated", ParentType, ContextType>;
   userCreated?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "userCreated", ParentType, ContextType>;
   userDeleted?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "userDeleted", ParentType, ContextType>;
   userUpdated?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "userUpdated", ParentType, ContextType>;

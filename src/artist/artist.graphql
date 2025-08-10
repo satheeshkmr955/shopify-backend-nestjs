@@ -3,7 +3,7 @@ scalar DateTime
 type Artist {
   id: ID!
   name: String!
-  songs: [Song!]!
+  songs: [Song!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }

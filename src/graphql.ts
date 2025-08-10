@@ -73,7 +73,7 @@ export class UpdateUserInput {
 export class Artist {
     id: string;
     name: string;
-    songs: Song[];
+    songs?: Nullable<Song[]>;
     createdAt: DateTimeISO;
     updatedAt: DateTimeISO;
 }
@@ -117,6 +117,12 @@ export abstract class IMutation {
 export abstract class ISubscription {
     abstract userCreated(): Nullable<User> | Promise<Nullable<User>>;
 
+    abstract playlistCreated(): Nullable<Playlist> | Promise<Nullable<Playlist>>;
+
+    abstract playlistUpdated(): Nullable<Playlist> | Promise<Nullable<Playlist>>;
+
+    abstract playlistDeleted(): Nullable<Playlist> | Promise<Nullable<Playlist>>;
+
     abstract userUpdated(): Nullable<User> | Promise<Nullable<User>>;
 
     abstract userDeleted(): Nullable<User> | Promise<Nullable<User>>;
@@ -131,7 +137,7 @@ export class PaginationInfo {
 export class Playlist {
     id: string;
     name: string;
-    songs: Song[];
+    songs?: Nullable<Song[]>;
     user: User;
     createdAt: DateTimeISO;
     updatedAt: DateTimeISO;
@@ -164,7 +170,7 @@ export class Song {
     releasedDate: DateTimeISO;
     duration: number;
     lyrics: string;
-    artists: Artist[];
+    artists?: Nullable<Artist[]>;
     playlist?: Nullable<Playlist>;
     createdAt: DateTimeISO;
     updatedAt: DateTimeISO;

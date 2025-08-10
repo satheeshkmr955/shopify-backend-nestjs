@@ -17,7 +17,7 @@ type Song {
   releasedDate: DateTime!
   duration: Int!
   lyrics: String!
-  artists: [Artist!]!
+  artists: [Artist!]
   playlist: Playlist
   createdAt: DateTime!
   updatedAt: DateTime!
