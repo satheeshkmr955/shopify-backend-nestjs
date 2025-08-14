@@ -20,7 +20,7 @@ import {
   ValidateDTO,
   ValidateSchema,
 } from './dto/auth.schema';
-import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
+import { PubSubService } from 'src/pubSub/PubSub.service';
 import { USER_CREATED } from 'src/constants/events.constant';
 
 import { RequestUser } from 'src/common/types/user.types';
@@ -30,7 +30,7 @@ export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
-    private readonly redisPubSubService: RedisPubSubService,
+    private readonly pubSubService: PubSubService,
   ) {}
 
   @Mutation(() => User)
@@ -39,7 +39,7 @@ export class AuthResolver {
     input: CreateUserDTO,
   ) {
     const userCreated = await this.userService.create(input);
-    this.redisPubSubService.pubSub.publish(USER_CREATED, { userCreated });
+    this.pubSubService.pubSub.publish(USER_CREATED, { userCreated });
     return userCreated;
   }
 
@@ -78,6 +78,6 @@ export class AuthResolver {
 
   @Subscription(() => User)
   userCreated() {
-    return this.redisPubSubService.pubSub.subscribe(USER_CREATED);
+    return this.pubSubService.pubSub.subscribe(USER_CREATED);
   }
 }

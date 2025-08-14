@@ -15,7 +15,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 import { UserService } from './user.service';
 import { UpdateUserDTO, UpdateUserSchema } from './dto/user.schema';
-import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
+import { PubSubService } from 'src/pubSub/PubSub.service';
 import { USER_DELETED, USER_UPDATED } from 'src/constants/events.constant';
 
 import { RequestUser } from 'src/common/types/user.types';
@@ -25,7 +25,7 @@ import { RequestUser } from 'src/common/types/user.types';
 export class UserResolver {
   constructor(
     private readonly userService: UserService,
-    private readonly redisPubSubService: RedisPubSubService,
+    private readonly pubSubService: PubSubService,
   ) {}
 
   @Query('profile')
@@ -50,7 +50,7 @@ export class UserResolver {
     input: UpdateUserDTO,
   ) {
     const userUpdated = await this.userService.update(input.id, input);
-    this.redisPubSubService.pubSub.publish(USER_UPDATED, { userUpdated });
+    this.pubSubService.pubSub.publish(USER_UPDATED, { userUpdated });
     return userUpdated;
   }
 
@@ -60,17 +60,17 @@ export class UserResolver {
     input: IDInput,
   ) {
     const userDeleted = await this.userService.remove(input.id);
-    this.redisPubSubService.pubSub.publish(USER_DELETED, { userDeleted });
+    this.pubSubService.pubSub.publish(USER_DELETED, { userDeleted });
     return userDeleted;
   }
 
   @Subscription(() => User)
   userUpdated() {
-    return this.redisPubSubService.pubSub.subscribe(USER_UPDATED);
+    return this.pubSubService.pubSub.subscribe(USER_UPDATED);
   }
 
   @Subscription(() => User)
   userDeleted() {
-    return this.redisPubSubService.pubSub.subscribe(USER_DELETED);
+    return this.pubSubService.pubSub.subscribe(USER_DELETED);
   }
 }

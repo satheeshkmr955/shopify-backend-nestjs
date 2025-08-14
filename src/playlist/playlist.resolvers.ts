@@ -20,7 +20,7 @@ import {
   UpdatePlaylistDTO,
   UpdatePlaylistSchema,
 } from './dto/playlist.schema';
-import { RedisPubSubService } from 'src/redisPubSub/redisPubSub.service';
+import { PubSubService } from 'src/pubSub/PubSub.service';
 import {
   PLAYLIST_CREATED,
   PLAYLIST_DELETED,
@@ -34,7 +34,7 @@ import { RequestUser } from 'src/common/types/user.types';
 export class PlaylistResolver {
   constructor(
     private readonly playlistService: PlaylistService,
-    private readonly redisPubSubService: RedisPubSubService,
+    private readonly pubSubService: PubSubService,
   ) {}
 
   @Query('playlists')
@@ -55,7 +55,7 @@ export class PlaylistResolver {
   ) {
     const user = context.req.user;
     const playlistCreated = await this.playlistService.create(input, user);
-    this.redisPubSubService.pubSub.publish(PLAYLIST_CREATED, {
+    this.pubSubService.pubSub.publish(PLAYLIST_CREATED, {
       playlistCreated,
     });
     return playlistCreated;
@@ -67,7 +67,7 @@ export class PlaylistResolver {
     input: UpdatePlaylistDTO,
   ) {
     const playlistUpdated = await this.playlistService.update(input.id, input);
-    this.redisPubSubService.pubSub.publish(PLAYLIST_UPDATED, {
+    this.pubSubService.pubSub.publish(PLAYLIST_UPDATED, {
       playlistUpdated,
     });
     return playlistUpdated;
@@ -79,7 +79,7 @@ export class PlaylistResolver {
     input: IDInput,
   ) {
     const playlistDeleted = await this.playlistService.remove(input.id);
-    this.redisPubSubService.pubSub.publish(PLAYLIST_DELETED, {
+    this.pubSubService.pubSub.publish(PLAYLIST_DELETED, {
       playlistDeleted,
     });
     return playlistDeleted;
@@ -87,16 +87,16 @@ export class PlaylistResolver {
 
   @Subscription(() => Playlist)
   playlistCreated() {
-    return this.redisPubSubService.pubSub.subscribe(PLAYLIST_CREATED);
+    return this.pubSubService.pubSub.subscribe(PLAYLIST_CREATED);
   }
 
   @Subscription(() => Playlist)
   playlistUpdated() {
-    return this.redisPubSubService.pubSub.subscribe(PLAYLIST_UPDATED);
+    return this.pubSubService.pubSub.subscribe(PLAYLIST_UPDATED);
   }
 
   @Subscription(() => Playlist)
   playlistDeleted() {
-    return this.redisPubSubService.pubSub.subscribe(PLAYLIST_DELETED);
+    return this.pubSubService.pubSub.subscribe(PLAYLIST_DELETED);
   }
 }

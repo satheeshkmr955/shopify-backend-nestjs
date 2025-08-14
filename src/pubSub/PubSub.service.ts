@@ -13,7 +13,7 @@ import type SuperJSON from 'superjson';
 import { PubSubEventMap } from 'src/generated/pubsub-event-map';
 
 @Injectable()
-export class RedisPubSubService implements OnModuleInit, OnModuleDestroy {
+export class PubSubService implements OnModuleInit, OnModuleDestroy {
   public pubSub: PubSub<PubSubEventMap>;
   private publishClient: Redis;
   private subscribeClient: Redis;
