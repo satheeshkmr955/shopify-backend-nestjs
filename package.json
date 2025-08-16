@@ -22,6 +22,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@envelop/response-cache": "^8.0.0",
+    "@envelop/response-cache-redis": "^4.2.4",
     "@escape.tech/graphql-armor": "^3.1.6",
     "@graphql-yoga/nestjs": "^3.15.1",
     "@graphql-yoga/redis-event-target": "^3.0.3",

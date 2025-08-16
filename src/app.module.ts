@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
 import { DateTimeISOResolver } from 'graphql-scalars';
 import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { APP_FILTER } from '@nestjs/core';
 import { EnvelopArmorPlugin } from '@escape.tech/graphql-armor';
+import Redis from 'ioredis';
+import { useResponseCache } from '@envelop/response-cache';
+import { createRedisCache } from '@envelop/response-cache-redis';
+
 
 import { SongsModule } from './songs/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
@@ -26,21 +30,39 @@ import { GraphQLContext } from './common/types/graphql.types';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    GraphQLModule.forRoot<YogaDriverConfig>({
+    GraphQLModule.forRootAsync<YogaDriverConfig>({
       driver: YogaDriver,
-      typePaths: ['./**/*.graphql'],
-      resolvers: { DateTime: DateTimeISOResolver },
-      context: ({ req, res }: GraphQLContext) => ({
-        req,
-        res,
-      }),
-      plugins: [
-        EnvelopArmorPlugin(),
-        useSetResponseHeader(),
-      ],
-      definitions: {
-        path: join(process.cwd(), 'src/graphql.ts'),
-        outputAs: 'class',
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const redisUrl = configService.get<string>('REDIS_URL') as string;
+        const redis = new Redis(redisUrl);
+        const cache = createRedisCache({ redis });
+
+        const isDev = configService.get<string>('NODE_ENV') === 'development';
+
+        return {
+          typePaths: ['./**/*.graphql'],
+          resolvers: { DateTime: DateTimeISOResolver },
+          context: ({ req, res }: GraphQLContext) => ({
+            req,
+            res,
+          }),
+          plugins: [
+            EnvelopArmorPlugin(),
+            useSetResponseHeader(),
+            useResponseCache({
+              cache,
+              session: ({ req }: GraphQLContext) => req?.user?.id ?? null,
+              includeExtensionMetadata: isDev,
+              ttl: 1000 * 60 * 60 * 1, // 1 hour
+            }),
+          ],
+          definitions: {
+            path: join(process.cwd(), 'src/graphql.ts'),
+            outputAs: 'class',
+          },
+        };
       },
     }),
     SongsModule,
