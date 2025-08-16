@@ -9,7 +9,8 @@ import { EnvelopArmorPlugin } from '@escape.tech/graphql-armor';
 import Redis from 'ioredis';
 import { useResponseCache } from '@envelop/response-cache';
 import { createRedisCache } from '@envelop/response-cache-redis';
-
+import { GraphQLError } from 'graphql';
+import { useMaskedErrors } from '@envelop/core';
 
 import { SongsModule } from './songs/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
@@ -53,9 +54,27 @@ import { GraphQLContext } from './common/types/graphql.types';
             useSetResponseHeader(),
             useResponseCache({
               cache,
-              session: ({ req }: GraphQLContext) => req?.user?.id ?? null,
+              session: ({ req }: GraphQLContext) => {
+                // Only scope cache per user for user-specific queries
+                const userId = req?.user?.id ?? null;
+                return userId;
+              },
+              ttlPerSchemaCoordinate: {
+                'Query.songs': 1000 * 30, // 30s cache for songs list
+                'Query.users': 1000 * 30, // 30s cache for users list
+                'Query.playlists': 1000 * 30, // 30s cache for playlists
+                'Query.profile': 1000 * 60 * 10, // 10 minutes cache for logged-in user's profile
+              },
+              ttlPerType: {
+                Artist: 1000 * 60 * 10, // 10 minutes,
+              },
               includeExtensionMetadata: isDev,
-              ttl: 1000 * 60 * 60 * 1, // 1 hour
+              ttl: 1000 * 60 * 5, // default 5 minutes
+            }),
+            useMaskedErrors({
+              maskError: (originalError) => {
+                return originalError as GraphQLError;
+              },
             }),
           ],
           definitions: {
