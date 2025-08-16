@@ -5,17 +5,20 @@ import { DateTimeISOResolver } from 'graphql-scalars';
 import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { APP_FILTER } from '@nestjs/core';
+import { EnvelopArmorPlugin } from '@escape.tech/graphql-armor';
 
 import { SongsModule } from './songs/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ArtistModule } from './artist/artist.module';
 import { PubSubModule } from './pubSub/PubSub.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { GraphQLBadRequestFilter } from './common/filters/graphql-bad-request.filter';
-import { RequestUser } from './common/types/user.types';
+import { useSetResponseHeader } from './utils/getResponseHeader';
+
+import { GraphQLContext } from './common/types/graphql.types';
 
 @Module({
   imports: [
@@ -27,10 +30,14 @@ import { RequestUser } from './common/types/user.types';
       driver: YogaDriver,
       typePaths: ['./**/*.graphql'],
       resolvers: { DateTime: DateTimeISOResolver },
-      context: ({ req, res }: { req: RequestUser; res: Response }) => ({
+      context: ({ req, res }: GraphQLContext) => ({
         req,
         res,
       }),
+      plugins: [
+        EnvelopArmorPlugin(),
+        useSetResponseHeader(),
+      ],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
         outputAs: 'class',
