@@ -1,4 +1,12 @@
 - [x] Remove /user, POST
 - [x] Create playlist when user is authenticated 
 - [x] redisPubSub to kafkaPubSub
-- [ ] redis for cache
+- [x] redis for cache
+- [ ] logger
+  - [ ] for logs to fluent bit
+  - [ ] add remote ip address
+  - [ ] userId
+  - [ ] cacheHit / cacheMiss
+  - [ ] resourceId
+  - [ ] nodeVersion
+  - [ ] appVersion

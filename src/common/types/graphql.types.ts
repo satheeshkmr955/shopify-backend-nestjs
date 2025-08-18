@@ -1,3 +1,8 @@
+import { YogaInitialContext } from 'graphql-yoga';
+
 import { RequestUser } from './user.types';
 
-export type GraphQLContext = { req: RequestUser; res: Response };
+export interface GraphQLContext extends YogaInitialContext {
+  req: RequestUser;
+  res: Response;
+}

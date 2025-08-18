@@ -11,6 +11,8 @@ import { useResponseCache } from '@envelop/response-cache';
 import { createRedisCache } from '@envelop/response-cache-redis';
 import { GraphQLError } from 'graphql';
 import { useMaskedErrors } from '@envelop/core';
+import { LoggerModule, PinoLogger } from 'nestjs-pino';
+import { randomUUID } from 'crypto';
 
 import { SongsModule } from './songs/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
@@ -22,20 +24,50 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLBadRequestFilter } from './common/filters/graphql-bad-request.filter';
 import { useSetResponseHeader } from './utils/getResponseHeader';
+import { graphqlLogger } from './common/plugins/graphql-logger.plugin';
+import { GraphQLLoggerModule } from './common/logger/graphql-logger.module';
 
 import { GraphQLContext } from './common/types/graphql.types';
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        transport:
+          process.env.NODE_ENV === 'development'
+            ? {
+                target: 'pino-pretty',
+                options: {
+                  colorize: true,
+                },
+              }
+            : undefined,
+        level: process.env.LOG_LEVEL || 'info',
+        genReqId: (req) => {
+          // Check for a pre-existing header first, or generate a new UUID
+          const reqId = req.headers['x-request-id'] || randomUUID();
+          req.headers['x-request-id'] = reqId; // Set the header for the downstream logger to use
+          return reqId;
+        },
+        redact: {
+          paths: ['req.headers.cookie', 'req.headers.authorization'],
+          censor: '***MASKED***', // Optional: specify the replacement value
+        },
+        customProps: () => ({
+          service: 'http-api',
+          env: process.env.NODE_ENV,
+        }),
+      },
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
     GraphQLModule.forRootAsync<YogaDriverConfig>({
       driver: YogaDriver,
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
+      imports: [ConfigModule, GraphQLLoggerModule],
+      inject: [ConfigService, 'GraphQLLogger'],
+      useFactory: (configService: ConfigService, logger: PinoLogger) => {
         const redisUrl = configService.get<string>('REDIS_URL') as string;
         const redis = new Redis(redisUrl);
         const cache = createRedisCache({ redis });
@@ -76,6 +108,7 @@ import { GraphQLContext } from './common/types/graphql.types';
                 return originalError as GraphQLError;
               },
             }),
+            graphqlLogger(logger),
           ],
           definitions: {
             path: join(process.cwd(), 'src/graphql.ts'),
