@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
 import { DateTimeISOResolver } from 'graphql-scalars';
 import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import pino from 'pino';
 import { GraphQLModule } from '@nestjs/graphql';
 import { APP_FILTER } from '@nestjs/core';
 import { EnvelopArmorPlugin } from '@escape.tech/graphql-armor';
@@ -29,10 +31,26 @@ import { GraphQLLoggerModule } from './common/logger/graphql-logger.module';
 
 import { GraphQLContext } from './common/types/graphql.types';
 
+const logDir = join(__dirname, '..', 'logs');
+if (!existsSync(logDir)) {
+  mkdirSync(logDir);
+}
+const logFilePath = join(
+  logDir,
+  `http_shopify_${new Date().toISOString()}.log`,
+);
+
 @Module({
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
+        stream:
+          process.env.NODE_ENV === 'production'
+            ? pino.destination({
+                dest: logFilePath,
+                sync: false,
+              })
+            : undefined,
         transport:
           process.env.NODE_ENV === 'development'
             ? {

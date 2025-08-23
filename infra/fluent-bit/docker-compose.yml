@@ -1,0 +1,18 @@
+services:
+  fluent-bit:
+    image: fluent/fluent-bit:4.0.7
+    container_name: fluent-bit-shopify
+    restart: unless-stopped
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./parsers.conf:/fluent-bit/etc/parsers.conf
+      - ../../logs:/app_logs
+    ports:
+      - '24224:24224'
+    command: /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf
+    networks:
+      - shopify_network
+
+networks:
+  shopify_network:
+    external: true

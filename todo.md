@@ -3,10 +3,20 @@
 - [x] redisPubSub to kafkaPubSub
 - [x] redis for cache
 - [ ] logger
-  - [ ] for logs to fluent bit
+  - [x] forward logs to fluent bit
+  - [x] fluent bit to opensearch
+  - [x] reqId
+  - [x] userId / email
   - [ ] add remote ip address
-  - [ ] userId
   - [ ] cacheHit / cacheMiss
   - [ ] resourceId
   - [ ] nodeVersion
   - [ ] appVersion
+- [ ] redpanda license check after trial
+- [ ] use env for docker-compose.yml environment
+- [ ] fluent-bit fluent-bit.conf use .env
+- [ ] opensearch docker-compose for healthcheck use .env
+- [ ] graphql-logger.provide.ts rotate filename
+- [ ] app.module.ts rotate filename
+- [ ] docker-compose log rotate
+- [ ] process.env using configService

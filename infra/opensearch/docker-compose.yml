@@ -1,0 +1,114 @@
+services:
+  opensearch-node1:
+    image: opensearchproject/opensearch:3.1.0
+    container_name: opensearch-node1-shopify
+    restart: unless-stopped
+    environment:
+      - cluster.name=opensearch-docker-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2,opensearch-node3
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2,opensearch-node3
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Shopify!@3
+      - plugins.security.ssl.http.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+    ports:
+      - '9200:9200'
+    networks:
+      - shopify_network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "curl -f -u 'admin:Shopify!@3' http://localhost:9200/_cluster/health?wait_for_status=green -s >/dev/null || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  opensearch-node2:
+    image: opensearchproject/opensearch:3.1.0
+    container_name: opensearch-node2-shopify
+    restart: unless-stopped
+    environment:
+      - cluster.name=opensearch-docker-cluster
+      - node.name=opensearch-node2
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2,opensearch-node3
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2,opensearch-node3
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Shopify!@3
+      - plugins.security.ssl.http.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data2:/usr/share/opensearch/data
+    networks:
+      - shopify_network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "curl -f -u 'admin:Shopify!@3' http://localhost:9200/_cluster/health?wait_for_status=green -s >/dev/null || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  opensearch-node3:
+    image: opensearchproject/opensearch:3.1.0
+    container_name: opensearch-node3-shopify
+    restart: unless-stopped
+    environment:
+      - cluster.name=opensearch-docker-cluster
+      - node.name=opensearch-node3
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2,opensearch-node3
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2,opensearch-node3
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Shopify!@3
+      - plugins.security.ssl.http.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data3:/usr/share/opensearch/data
+    networks:
+      - shopify_network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "curl -f -u 'admin:Shopify!@3' http://localhost:9200/_cluster/health?wait_for_status=green -s >/dev/null || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.1.0
+    container_name: opensearch-dashboards-shopify
+    restart: unless-stopped
+    ports:
+      - '5601:5601'
+    environment:
+      - OPENSEARCH_HOSTS=http://opensearch-node1:9200
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=Shopify!@3
+    networks:
+      - shopify_network
+    depends_on:
+      opensearch-node1:
+        condition: service_healthy
+
+volumes:
+  opensearch-data1:
+  opensearch-data2:
+  opensearch-data3:
+
+networks:
+  shopify_network:
+    external: true

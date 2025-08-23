@@ -22,8 +22,15 @@ services:
       # Tells Seastar (the framework Redpanda uses under the hood) to use 1 core on the system.
       - --smp 1
       - --default-log-level=info
+      # Explicitly disable common enterprise features to remove trial warning
+      - --set cloud_storage_enabled=false
+      - --set partition_autobalancing_mode=node_add
+      - --set core_balancing_continuous=false
+      - --set audit_enabled=false
+      - --set enable_schema_id_validation=none
     image: docker.redpanda.com/redpandadata/redpanda:v25.2.1
-    container_name: redpanda-0
+    container_name: redpanda-0-shopify
+    restart: unless-stopped
     volumes:
       - redpanda-0:/var/lib/redpanda/data
     networks:
@@ -48,8 +55,15 @@ services:
       - --smp 1
       - --default-log-level=info
       - --seeds redpanda-0:33145
+      # Explicitly disable common enterprise features to remove trial warning
+      - --set cloud_storage_enabled=false
+      - --set partition_autobalancing_mode=node_add
+      - --set core_balancing_continuous=false
+      - --set audit_enabled=false
+      - --set enable_schema_id_validation=none
     image: docker.redpanda.com/redpandadata/redpanda:v25.2.1
-    container_name: redpanda-1
+    container_name: redpanda-1-shopify
+    restart: unless-stopped
     volumes:
       - redpanda-1:/var/lib/redpanda/data
     networks:
@@ -76,8 +90,15 @@ services:
       - --smp 1
       - --default-log-level=info
       - --seeds redpanda-0:33145
+      # Explicitly disable common enterprise features to remove trial warning
+      - --set cloud_storage_enabled=false
+      - --set partition_autobalancing_mode=node_add
+      - --set core_balancing_continuous=false
+      - --set audit_enabled=false
+      - --set enable_schema_id_validation=none
     image: docker.redpanda.com/redpandadata/redpanda:v25.2.1
-    container_name: redpanda-2
+    container_name: redpanda-2-shopify
+    restart: unless-stopped
     volumes:
       - redpanda-2:/var/lib/redpanda/data
     networks:
@@ -90,7 +111,8 @@ services:
     depends_on:
       - redpanda-0
   console:
-    container_name: redpanda-console
+    container_name: redpanda-console-shopify
+    restart: unless-stopped
     image: docker.redpanda.com/redpandadata/console:v3.1.3
     networks:
       - shopify_network
