@@ -4,7 +4,6 @@ import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
 import { DateTimeISOResolver } from 'graphql-scalars';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
-import pino from 'pino';
 import { GraphQLModule } from '@nestjs/graphql';
 import { APP_FILTER } from '@nestjs/core';
 import { EnvelopArmorPlugin } from '@escape.tech/graphql-armor';
@@ -35,31 +34,33 @@ const logDir = join(__dirname, '..', 'logs');
 if (!existsSync(logDir)) {
   mkdirSync(logDir);
 }
-const logFilePath = join(
-  logDir,
-  `http_shopify_${new Date().toISOString()}.log`,
-);
+const logFilePath = join(logDir, `http_shopify.log`);
 
 @Module({
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
-        stream:
-          process.env.NODE_ENV === 'production'
-            ? pino.destination({
-                dest: logFilePath,
-                sync: false,
-              })
-            : undefined,
         transport:
           process.env.NODE_ENV === 'development'
             ? {
                 target: 'pino-pretty',
                 options: {
                   colorize: true,
+                  singleLine: true,
                 },
               }
-            : undefined,
+            : {
+                target: 'pino-roll',
+                options: {
+                  file: logFilePath,
+                  frequency: 'daily',
+                  mkdir: true,
+                  size: '10M',
+                  limit: {
+                    count: 10,
+                  },
+                },
+              },
         level: process.env.LOG_LEVEL || 'info',
         genReqId: (req) => {
           // Check for a pre-existing header first, or generate a new UUID
