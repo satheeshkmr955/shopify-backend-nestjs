@@ -19,4 +19,4 @@
 - [x] graphql-logger.provide.ts rotate filename
 - [x] app.module.ts rotate filename
 - [x] docker-compose log rotate
-- [ ] process.env using configService
+- [x] process.env using configService

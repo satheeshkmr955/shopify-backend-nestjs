@@ -2,6 +2,7 @@ import { Logger, TransportTargetOptions } from 'pino';
 import pino from 'pino';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { ConfigService } from '@nestjs/config';
 
 const logDir = join(__dirname, '..', '..', '..', 'logs');
 if (!existsSync(logDir)) {
@@ -11,8 +12,11 @@ const logFilePath = join(logDir, `graphql_shopify.log`);
 
 export const GraphQLLoggerProvider = {
   provide: 'GraphQLLogger',
-  useFactory: (): Logger => {
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService): Logger => {
     const targets: TransportTargetOptions[] = [];
+    const nodeEnv = configService.get<string>('NODE_ENV') as string;
+    const logLevel = configService.get<string>('LOG_LEVEL') as string;
 
     targets.push({
       target: 'pino-roll',
@@ -27,7 +31,7 @@ export const GraphQLLoggerProvider = {
       },
     });
 
-    if (process.env.NODE_ENV === 'development') {
+    if (nodeEnv === 'development') {
       targets.push({
         target: 'pino-pretty',
         options: {
@@ -38,13 +42,13 @@ export const GraphQLLoggerProvider = {
     }
 
     return pino({
-      level: process.env.LOG_LEVEL || 'info',
+      level: logLevel,
       transport: {
         targets: targets,
       },
       base: {
         service: 'graphql-api',
-        env: process.env.NODE_ENV,
+        env: nodeEnv,
       },
       timestamp: pino.stdTimeFunctions.isoTime,
       hooks: {

@@ -37,58 +37,67 @@ if (!existsSync(logDir)) {
 }
 const logFilePath = join(logDir, `http_shopify.log`);
 
-const targets: TransportTargetOptions[] = [];
-
-targets.push({
-  target: 'pino-roll',
-  options: {
-    file: logFilePath,
-    frequency: 'daily',
-    mkdir: true,
-    size: '10M',
-    limit: {
-      count: 10,
-    },
-  },
-});
-
-if (process.env.NODE_ENV === 'development') {
-  targets.push({
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      singleLine: true,
-    },
-  });
-}
-
 @Module({
   imports: [
-    LoggerModule.forRoot({
-      pinoHttp: {
-        transport: {
-          targets: targets,
-        },
-        level: process.env.LOG_LEVEL || 'info',
-        genReqId: (req) => {
-          // Check for a pre-existing header first, or generate a new UUID
-          const reqId = req.headers['x-request-id'] || randomUUID();
-          req.headers['x-request-id'] = reqId; // Set the header for the downstream logger to use
-          return reqId;
-        },
-        redact: {
-          paths: ['req.headers.cookie', 'req.headers.authorization'],
-          censor: '***MASKED***', // Optional: specify the replacement value
-        },
-        customProps: () => ({
-          service: 'http-api',
-          env: process.env.NODE_ENV,
-        }),
-      },
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const nodeEnv = configService.get<string>('NODE_ENV') as string;
+        const logLevel = configService.get<string>('LOG_LEVEL') as string;
+
+        const targets: TransportTargetOptions[] = [];
+
+        targets.push({
+          target: 'pino-roll',
+          options: {
+            file: logFilePath,
+            frequency: 'daily',
+            mkdir: true,
+            size: '10M',
+            limit: {
+              count: 10,
+            },
+          },
+        });
+
+        if (nodeEnv === 'development') {
+          targets.push({
+            target: 'pino-pretty',
+            options: {
+              colorize: true,
+              singleLine: true,
+            },
+          });
+        }
+
+        return {
+          pinoHttp: {
+            transport: {
+              targets: targets,
+            },
+            level: logLevel,
+            genReqId: (req) => {
+              // Check for a pre-existing header first, or generate a new UUID
+              const reqId = req.headers['x-request-id'] || randomUUID();
+              req.headers['x-request-id'] = reqId; // Set the header for the downstream logger to use
+              return reqId;
+            },
+            redact: {
+              paths: ['req.headers.cookie', 'req.headers.authorization'],
+              censor: '***MASKED***', // Optional: specify the replacement value
+            },
+            customProps: () => ({
+              service: 'http-api',
+              env: nodeEnv,
+            }),
+          },
+        };
+      },
     }),
     GraphQLModule.forRootAsync<YogaDriverConfig>({
       driver: YogaDriver,
