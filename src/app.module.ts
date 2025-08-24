@@ -29,6 +29,7 @@ import { graphqlLogger } from './common/plugins/graphql-logger.plugin';
 import { GraphQLLoggerModule } from './common/logger/graphql-logger.module';
 
 import { GraphQLContext } from './common/types/graphql.types';
+import type { TransportTargetOptions } from 'pino';
 
 const logDir = join(__dirname, '..', 'logs');
 if (!existsSync(logDir)) {
@@ -36,31 +37,38 @@ if (!existsSync(logDir)) {
 }
 const logFilePath = join(logDir, `http_shopify.log`);
 
+const targets: TransportTargetOptions[] = [];
+
+targets.push({
+  target: 'pino-roll',
+  options: {
+    file: logFilePath,
+    frequency: 'daily',
+    mkdir: true,
+    size: '10M',
+    limit: {
+      count: 10,
+    },
+  },
+});
+
+if (process.env.NODE_ENV === 'development') {
+  targets.push({
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      singleLine: true,
+    },
+  });
+}
+
 @Module({
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
-        transport:
-          process.env.NODE_ENV === 'development'
-            ? {
-                target: 'pino-pretty',
-                options: {
-                  colorize: true,
-                  singleLine: true,
-                },
-              }
-            : {
-                target: 'pino-roll',
-                options: {
-                  file: logFilePath,
-                  frequency: 'daily',
-                  mkdir: true,
-                  size: '10M',
-                  limit: {
-                    count: 10,
-                  },
-                },
-              },
+        transport: {
+          targets: targets,
+        },
         level: process.env.LOG_LEVEL || 'info',
         genReqId: (req) => {
           // Check for a pre-existing header first, or generate a new UUID
