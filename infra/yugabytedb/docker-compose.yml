@@ -31,6 +31,11 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s # Give it some time to start up
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '20m'
+        max-file: '25'
 
 volumes:
   yb_data:

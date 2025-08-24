@@ -9,6 +9,11 @@ services:
       - shopify_network
     volumes:
       - redis_data:/data
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
 volumes:
   redis_data:

@@ -12,6 +12,11 @@ services:
     command: /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf
     networks:
       - shopify_network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '20'
 
 networks:
   shopify_network:

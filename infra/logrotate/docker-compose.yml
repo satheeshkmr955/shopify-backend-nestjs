@@ -10,6 +10,11 @@ services:
       - ../../logs:/logs
     networks:
       - shopify_network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
 networks:
   shopify_network:

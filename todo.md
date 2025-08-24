@@ -18,5 +18,5 @@
 - [ ] opensearch docker-compose for healthcheck use .env
 - [x] graphql-logger.provide.ts rotate filename
 - [x] app.module.ts rotate filename
-- [ ] docker-compose log rotate
+- [x] docker-compose log rotate
 - [ ] process.env using configService
