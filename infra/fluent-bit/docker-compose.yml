@@ -7,6 +7,8 @@ services:
       - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - ./parsers.conf:/fluent-bit/etc/parsers.conf
       - ../../logs:/app_logs
+    env_file:
+      - ../../.env
     ports:
       - '24224:24224'
     command: /fluent-bit/bin/fluent-bit -c /fluent-bit/etc/fluent-bit.conf

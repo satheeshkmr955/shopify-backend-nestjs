@@ -13,9 +13,9 @@
   - [ ] nodeVersion
   - [ ] appVersion
 - [ ] redpanda license check after trial
-- [ ] use env for docker-compose.yml environment
-- [ ] fluent-bit fluent-bit.conf use .env
-- [ ] opensearch docker-compose for healthcheck use .env
+- [x] use env for docker-compose.yml environment
+- [x] fluent-bit fluent-bit.conf use .env
+- [x] opensearch docker-compose for healthcheck use .env
 - [x] graphql-logger.provide.ts rotate filename
 - [x] app.module.ts rotate filename
 - [x] docker-compose log rotate
