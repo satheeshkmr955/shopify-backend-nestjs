@@ -20,3 +20,6 @@
 - [x] app.module.ts rotate filename
 - [x] docker-compose log rotate
 - [x] process.env using configService
+- [x] pino fluent-bit opensearch for logs 
+- [ ] Grafana Mimir with Prometheus for metrics
+- [ ] Jaeger with Opensearch/ScyllaDB for traces
