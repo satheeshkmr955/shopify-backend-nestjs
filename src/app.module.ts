@@ -14,6 +14,8 @@ import { GraphQLError } from 'graphql';
 import { useMaskedErrors } from '@envelop/core';
 import { LoggerModule, PinoLogger } from 'nestjs-pino';
 import { randomUUID } from 'crypto';
+import { usePrometheus } from '@envelop/prometheus';
+
 
 import { SongsModule } from './songs/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
@@ -145,6 +147,26 @@ const logFilePath = join(logDir, `http_shopify.log`);
               },
             }),
             graphqlLogger(logger),
+            usePrometheus({
+              // endpoint: "/metrics/",
+              metrics: {
+                graphql_envelop_request_time_summary: true,
+                graphql_envelop_phase_parse: true,
+                graphql_envelop_phase_validate: true,
+                graphql_envelop_phase_context: true,
+                graphql_envelop_phase_execute: true,
+                graphql_envelop_phase_subscribe: true,
+                graphql_envelop_error_result: true,
+                graphql_envelop_deprecated_field: true,
+                graphql_envelop_request_duration: true,
+                graphql_envelop_schema_change: true,
+                graphql_envelop_request: true,
+                // This metric is disabled by default.
+                // Warning: enabling resolvers level metrics will introduce significant overhead
+                graphql_envelop_execute_resolver: true,
+              },
+              // resolversWhitelist: ["Mutation.*", "Query.*"],
+            }),
           ],
           definitions: {
             path: join(process.cwd(), 'src/graphql.ts'),

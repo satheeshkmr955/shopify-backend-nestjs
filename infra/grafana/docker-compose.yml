@@ -1,0 +1,26 @@
+services:
+  grafana:
+    image: grafana/grafana:12.1
+    container_name: grafana-shopify
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ../../.env
+    ports:
+      - '3001:3000'
+    networks:
+      - shopify_network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '20'
+
+volumes:
+  grafana-data:
+
+networks:
+  shopify_network:
+    external: true

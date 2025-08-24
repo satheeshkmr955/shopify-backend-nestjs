@@ -1,0 +1,28 @@
+services:
+  mimir:
+    image: grafana/mimir:2.17.0
+    container_name: mimir-shopify
+    restart: unless-stopped
+    volumes:
+      - ./mimir.yaml:/etc/mimir/mimir.yaml
+      - mimir-data:/var/lib/mimir
+    ports:
+      - '9009:9009'
+      - '8082:8080'
+    command:
+      - --config.file=/etc/mimir/mimir.yaml
+      - --target=all
+    networks:
+      - shopify_network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '20'
+
+networks:
+  shopify_network:
+    external: true
+
+volumes:
+  mimir-data:

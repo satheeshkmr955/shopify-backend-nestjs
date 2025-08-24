@@ -22,4 +22,6 @@
 - [x] process.env using configService
 - [x] pino fluent-bit opensearch for logs 
 - [ ] Grafana Mimir with Prometheus for metrics
+  - [x] https://github.com/grafana/mimir/blob/main/operations/mimir-mixin-compiled/dashboards
+  - [ ] infra/mimir/mimir.yaml dev to prod
 - [ ] Jaeger with Opensearch/ScyllaDB for traces
