@@ -1,0 +1,16 @@
+services:
+  logrotate:
+    container_name: logrotate-shopify
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: logrotate:1.0
+    restart: unless-stopped
+    volumes:
+      - ../../logs:/logs
+    networks:
+      - shopify_network
+
+networks:
+  shopify_network:
+    external: true
